@@ -68,8 +68,6 @@ def str_to_num(str):
 
 breaking_news = cv2.imread('images/breakingnews.png')
 
-pytesseract.pytesseract.tesseract_cmd = r'C:\Users\Shourik\AppData\Local\Programs\Tesseract-OCR\tesseract.exe'
-
 text = pytesseract.image_to_string(breaking_news)
 
 # Thresh works best for room 1
