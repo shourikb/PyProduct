@@ -16,6 +16,7 @@ users = sqlalchemy.Table(
     metadata,
     sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True),
     sqlalchemy.Column("username", sqlalchemy.String),
+    sqlalchemy.Column("password", sqlalchemy.String),
     sqlalchemy.Column("email", sqlalchemy.String),
     sqlalchemy.Column("full_name", sqlalchemy.String),
     sqlalchemy.Column("disabled", sqlalchemy.Boolean),
@@ -30,6 +31,7 @@ metadata.create_all(engine)
 
 class UserIn(BaseModel):
     username: str
+    password: str
     email: Optional[str] = None
     full_name: Optional[str] = None
     disabled: Optional[bool] = None
@@ -38,6 +40,15 @@ class UserIn(BaseModel):
 class User(BaseModel):
     id: int
     username: str
+    password: str
     email: Optional[str] = None
     full_name: Optional[str] = None
     disabled: Optional[bool] = None
+
+def get_user_from_cred(username: str, password: str):
+    selected_user = users.select().where(users.c.username == username).where(users.c.password == password)
+    conn = engine.connect()
+    result = conn.execute(selected_user)
+    return result.fetchone()
+
+# print(get_user_from_cred("jiaming", "ilovelia"))
