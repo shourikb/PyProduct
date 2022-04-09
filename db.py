@@ -1,7 +1,5 @@
-from typing import Optional
 import databases
 import sqlalchemy
-from pydantic import BaseModel
 
 # SQLAlchemy specific code, as with any other app
 DATABASE_URL = "sqlite:///./data.sqlite"
@@ -11,12 +9,11 @@ database = databases.Database(DATABASE_URL)
 
 metadata = sqlalchemy.MetaData()
 
-users = sqlalchemy.Table(
+usersTable = sqlalchemy.Table(
     "users",
     metadata,
-    sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True),
     sqlalchemy.Column("username", sqlalchemy.String),
-    sqlalchemy.Column("password", sqlalchemy.String),
+    sqlalchemy.Column("hashed_password", sqlalchemy.String),
     sqlalchemy.Column("email", sqlalchemy.String),
     sqlalchemy.Column("full_name", sqlalchemy.String),
     sqlalchemy.Column("disabled", sqlalchemy.Boolean),
@@ -29,26 +26,8 @@ engine = sqlalchemy.create_engine(
 metadata.create_all(engine)
 
 
-class UserIn(BaseModel):
-    username: str
-    password: str
-    email: Optional[str] = None
-    full_name: Optional[str] = None
-    disabled: Optional[bool] = None
-
-
-class User(BaseModel):
-    id: int
-    username: str
-    password: str
-    email: Optional[str] = None
-    full_name: Optional[str] = None
-    disabled: Optional[bool] = None
-
 def get_user_from_cred(username: str, password: str):
-    selected_user = users.select().where(users.c.username == username).where(users.c.password == password)
+    selected_user = usersTable.select().where(usersTable.c.username == username).where(usersTable.c.password == password)
     conn = engine.connect()
     result = conn.execute(selected_user)
     return result.fetchone()
-
-# print(get_user_from_cred("jiaming", "ilovelia"))
